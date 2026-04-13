@@ -7,4 +7,3 @@ COPY . .
 RUN rm -rf /usr/local/lib/node_modules/npm /opt/yarn-v* /usr/local/lib/node_modules/corepack /root/.npm
 EXPOSE 5008
 CMD ["node", "server.js"]
-
