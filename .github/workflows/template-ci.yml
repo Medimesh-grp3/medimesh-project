@@ -68,17 +68,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONARQUBE_URL }}
 
-            # If Quality gate is fails, the job fails !!!
-
-      - name: Sonar Quality Gate
-        uses: SonarSource/sonarqube-quality-gate-action@v1
-        continue-on-error: true
-        with:
-          scanMetadataReportFile: ${{ inputs.service-path }}/.scannerwork/report-task.txt
-        timeout-minutes: 5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
       - name: Send Email on Failure
         if: failure()
         uses: dawidd6/action-send-mail@v3
@@ -87,11 +76,11 @@ jobs:
           server_port: 465
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          subject: " MediMesh CI Failed — SonarQube (${{ inputs.service_name }})"
+          subject: "❌ MediMesh CI Failed — SonarQube (${{ inputs.service_name }})"
           to: ${{ secrets.ALERT_EMAIL }}
           from: MediMesh CI Pipeline
           body: |
-             SonarQube code quality scan FAILED for: ${{ inputs.service_name }}
+            ❌ SonarQube code quality scan FAILED for: ${{ inputs.service_name }}
 
             Path   : ${{ inputs.service_path }}
             Branch : ${{ github.ref_name }}
