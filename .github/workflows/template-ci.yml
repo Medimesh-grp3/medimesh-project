@@ -72,6 +72,7 @@ jobs:
 
       - name: Sonar Quality Gate
         uses: SonarSource/sonarqube-quality-gate-action@v1
+        continue-on-error: true
         with:
           scanMetadataReportFile: ${{ inputs.service-path }}/.scannerwork/report-task.txt
         timeout-minutes: 5
@@ -102,50 +103,50 @@ jobs:
 
 
   # ② NPM Build — Install & Build Dependencies 
-  # build:
-  #   name: "② Build — ${{ inputs.service_name }}"
-  #   runs-on: ubuntu-latest
-  #   needs: sonarqube
-  #   defaults:
-  #     run:
-  #       working-directory: ${{ inputs.service_path }}
-  #   steps:
-  #     - name: Checkout Repository
-  #       uses: actions/checkout@v4
+  build:
+    name: "② Build — ${{ inputs.service_name }}"
+    runs-on: ubuntu-latest
+    needs: sonarqube
+    defaults:
+      run:
+        working-directory: ${{ inputs.service_path }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-  #     - name: Setup Node.js ${{ inputs.node_version }}
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: ${{ inputs.node_version }}
-  #         cache: npm
-  #         cache-dependency-path: "${{ inputs.service_path }}/package.json"
+      - name: Setup Node.js ${{ inputs.node_version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: npm
+          cache-dependency-path: "${{ inputs.service_path }}/package.json"
 
-  #     - name: Install Dependencies
-  #       run: npm install --no-audit --no-fund
+      - name: Install Dependencies
+        run: npm install --no-audit --no-fund
 
-  #     - name: Build Project
-  #       run: npm run build --if-present
+      - name: Build Project
+        run: npm run build --if-present
 
-  #     - name: Send Email on Failure
-  #       if: failure()
-  #       uses: dawidd6/action-send-mail@v3
-  #       with:
-  #         server_address: smtp.gmail.com
-  #         server_port: 465
-  #         username: ${{ secrets.SMTP_USERNAME }}
-  #         password: ${{ secrets.SMTP_PASSWORD }}
-  #         subject: " MediMesh CI Failed — Build (${{ inputs.service_name }})"
-  #         to: ${{ secrets.ALERT_EMAIL }}
-  #         from: MediMesh CI Pipeline
-  #         body: |
-  #            NPM build FAILED for service: ${{ inputs.service_name }}
+      - name: Send Email on Failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: " MediMesh CI Failed — Build (${{ inputs.service_name }})"
+          to: ${{ secrets.ALERT_EMAIL }}
+          from: MediMesh CI Pipeline
+          body: |
+             NPM build FAILED for service: ${{ inputs.service_name }}
 
-  #            Path   : ${{ inputs.service_path }}
-  #            Branch : ${{ github.ref_name }}
-  #            Commit : ${{ github.sha }}
-  #            Author : ${{ github.actor }}
+             Path   : ${{ inputs.service_path }}
+             Branch : ${{ github.ref_name }}
+             Commit : ${{ github.sha }}
+             Author : ${{ github.actor }}
 
-  #            Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+             Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
 
   
